@@ -68,7 +68,7 @@ public:
     bool playerChoice();
     bool nextYear();
 
-    void Game::saveProgress(int currentYear);
+    void Game::saveProgress();
     bool Game::loadProgress();
     
 };

@@ -103,6 +103,7 @@ void Game::start() {
 
     for (int year = startYear; year <= 10; ++year) {
         yearInfoMsg(year);
+        saveProgress();
 
         int quitOption = 1;
         while(true) {
@@ -111,11 +112,12 @@ void Game::start() {
                 continue;
             } else break;
         }
+        
         if (quitOption == 1) {
             std::cout << "Игра сохранена.\n";
             return;
         }
-        saveProgress(year);
+        
 
         while (!playerChoice()); // Ожидание коректного пользовательского ввода
         if (!nextYear()) {
@@ -300,22 +302,33 @@ bool Game::nextYear() {
         std::cout << "Ваше правление каким-то образом привело к смерти всего населения...\n";
         return false;
     }
+    year_++;
     return true;
 }
 
 
 // Сохранение и загрузка прогресса
 
-void Game::saveProgress(int currentYear) {
+void Game::saveProgress() {
     json j;
-
     j["population"] = population_;
     j["acres"] = acres_;
     j["wheat"] = wheat_;
+    j["year"] = year_;
+
+    j["newPeople"] = newPeople_;
+    j["starvedPeople"] = starvedPeople_;
+    j["acrePrice"] = acrePrice_;
+    j["wheatPerAcre"] = wheatPerAcre_;
+    j["eatenByRats"] = wheatPerAcre_;
+    j["plague"] = plague_;
+    
     j["plantedAcres"] = plantedAcres_;
     j["eatenWheat"] = eatenWheat_;
+
     j["totalStarvedPercent"] = totalStarvedPercent_;
-    j["year"] = currentYear;
+    
+
 
     std::ofstream file("save.json");
     if (file.is_open()) {
@@ -335,10 +348,27 @@ bool Game::loadProgress() {
     population_ = j["population"];
     acres_ = j["acres"];
     wheat_ = j["wheat"];
+    year_ = j["year"];
+
+    newPeople_ = j["newPeople"];
+    starvedPeople_ = j["starvedPeople"];
+    acrePrice_ = j["acrePrice"];
+    wheatPerAcre_ = j["wheatPerAcre"];
+    eatenByRats_ = j["eatenByRats"];
+    plague_ = j["plague"];
+
     plantedAcres_ = j["plantedAcres"];
     eatenWheat_ = j["eatenWheat"];
+
     totalStarvedPercent_ = j["totalStarvedPercent"];
-    year_ = j["year"];
+
+    // population_ = j["population"];
+    // acres_ = j["acres"];
+    // wheat_ = j["wheat"];
+    // plantedAcres_ = j["plantedAcres"];
+    // eatenWheat_ = j["eatenWheat"];
+    // totalStarvedPercent_ = j["totalStarvedPercent"];
+    // year_ = j["year"];
 
     std::cout << "Прогресс загружен. Продолжаем с года " << year_ << ".\n";
     return true;
