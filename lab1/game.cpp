@@ -29,21 +29,14 @@ int Game::calcWheatPerAcre() {
     return wheatPerAcre_;
 };
 
-// int Game::calcEatenByRats() {
-//     eatenByRats_ = eatenByRatsDist_(gen);
-//     return eatenByRats_;
-// };
 int Game::calcEatenByRats() {
-    // ratsPercentDist_ генерирует процент 0..7
     int pct = ratsPercentDist_(gen);
-    // считаем процент от имеющихся запасов + будущего урожая? 
-    // В этой реализации считаем от запасов **до** уборки (вариант логики можно поменять)
+
     eatenByRats_ = (wheat_ + plantedAcres_ * wheatPerAcre_) * pct / 100;
     return eatenByRats_;
 }
 
 int Game::calcStarvedPeople() { 
-    std::cout << "DEBUG " << population_ << " " << eatenWheat_ << std::endl;
     starvedPeople_ = population_ - eatenWheat_ / 20;
     if (starvedPeople_ < 0)
         starvedPeople_ = 0;
@@ -66,11 +59,10 @@ bool Game::calcPlague() {
 };
 
 void Game::updateMainInfo() {
-    // Обновляем население и запасы
     population_ = population_ - starvedPeople_ + newPeople_;
     if (plague_)
         population_ /= 2;
-    // Собрали урожай и потеряли от крыс
+
     wheat_ = wheat_ + plantedAcres_ * wheatPerAcre_ - eatenByRats_;
     if (wheat_ < 0)
         wheat_ = 0;
@@ -102,8 +94,7 @@ void Game::start() {
         }
         if (saveOption == 1) {
             if (Game::loadProgress()) {
-                // если загрузка прошла успешно, устанавливаем текущий год
-                startYear = year_; // если есть поле year_
+                startYear = year_;
             }
         } else {
             std::remove("save.json");
@@ -112,10 +103,6 @@ void Game::start() {
 
     for (int year = startYear; year <= 10; ++year) {
         yearInfoMsg(year);
-
-        // std::cout << "Хотите выйти и сохранить прогресс? (1 - да, 0 - нет): ";
-        // int quit;
-        // std::cin >> quit;
 
         int quitOption = 1;
         while(true) {
@@ -172,7 +159,6 @@ void Game::yearInfoMsg(const int& year) const {
     std::cout << "\t1 акр земли стоит сейчас " << acrePrice_ << " бушель." << std::endl;
 }
 
-
 bool isNumber(const std::string& s) {
     if (s.empty()) return false;
     size_t i = 0;
@@ -182,11 +168,11 @@ bool isNumber(const std::string& s) {
     return true;
 }
 
-
 bool Game::readValue(const std::string& prompt, int& value) {
     std::cout << prompt;
     std::string input;
     if (!std::getline(std::cin, input)) return false;
+
     // убираем ведущие/трейлинг пробелы
     auto l = input.find_first_not_of(" \t\r\n");
     auto r = input.find_last_not_of(" \t\r\n");
@@ -208,7 +194,7 @@ bool Game::playerChoice() {
     int futureAcres = acres_;
     int futureWheat = wheat_;
 
-    // ---- ПОКУПКА ЗЕМЛИ ----
+    // ПОКУПКА ЗЕМЛИ
     int acresToBuy = 0;
     if (!readValue("Сколько акров земли повелеваешь купить? ", acresToBuy)) {
         negativeInputMsg();
@@ -224,7 +210,7 @@ bool Game::playerChoice() {
     futureAcres += acresToBuy;
     futureWheat -= acresToBuy * acrePrice_;
 
-    // ---- ПРОДАЖА ЗЕМЛИ ----
+    // ПРОДАЖА ЗЕМЛИ
     int acresToSell = 0;
     if (!readValue("Сколько акров земли повелеваешь продать? ", acresToSell)) {
         negativeInputMsg();
@@ -240,7 +226,7 @@ bool Game::playerChoice() {
     futureAcres -= acresToSell;
     futureWheat += acresToSell * acrePrice_;
 
-    // ---- СЪЕСТЬ ПШЕНИЦУ ----
+    // ПОЕДАНИЕ ПШЕНИЦЫ 
     int wheatToEat = 0;
     if (!readValue("Сколько бушелей пшеницы повелеваешь съесть? ", wheatToEat)) {
         negativeInputMsg();
@@ -255,7 +241,7 @@ bool Game::playerChoice() {
 
     futureWheat -= wheatToEat;
 
-    // ---- ЗАСЕВ ----
+    // ЗАСЕВ ПШЕНИЦЫ
     int acresToSeed = 0;
     if (!readValue("Сколько акров земли повелеваешь засеять? ", acresToSeed)) {
         negativeInputMsg();
@@ -280,7 +266,7 @@ bool Game::playerChoice() {
 
     futureWheat -= acresToSeed * 5;
 
-    // ---- ПРИМЕНЕНИЕ ИЗМЕНЕНИЙ ----
+    // ПРИМЕНЕНИЕ ИЗМЕНЕНИЙ
     wheat_ = futureWheat;
     acres_ = futureAcres;
     plantedAcres_ = acresToSeed;
@@ -331,14 +317,9 @@ void Game::saveProgress(int currentYear) {
     j["totalStarvedPercent"] = totalStarvedPercent_;
     j["year"] = currentYear;
 
-    // сохраняем состояние генератора
-    // std::ostringstream oss;
-    // oss << gen;
-    // j["generator"] = oss.str();
-
     std::ofstream file("save.json");
     if (file.is_open()) {
-        file << j.dump(4); // красивое форматирование
+        file << j.dump(4);
         file.close();
         std::cout << "Прогресс сохранён.\n";
     }
@@ -358,10 +339,6 @@ bool Game::loadProgress() {
     eatenWheat_ = j["eatenWheat"];
     totalStarvedPercent_ = j["totalStarvedPercent"];
     year_ = j["year"];
-
-    // восстановление генератора
-    // std::istringstream iss(j["generator"].get<std::string>());
-    // iss >> gen;
 
     std::cout << "Прогресс загружен. Продолжаем с года " << year_ << ".\n";
     return true;
