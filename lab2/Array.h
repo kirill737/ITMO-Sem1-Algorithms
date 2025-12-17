@@ -1,8 +1,8 @@
 #pragma once
 
 #include <cstdlib>
-#include <utility>  // для move
-#include <cassert>
+#include <utility>
+
 
 template<typename T>
 class Array final {
@@ -13,6 +13,10 @@ private:
     static constexpr double CAPACITY_MUL = 2;
 public:
     class Iterator {
+    private:
+        T* m_ptr;
+        int m_index;
+        int m_size;
     public:
         Iterator(T* ptr, int index, int size)
             : m_ptr(ptr), m_index(index), m_size(size) {}
@@ -35,13 +39,15 @@ public:
         Iterator& operator++() { next(); return *this; } // Префиксный
         Iterator operator++(int) { Iterator tmp = *this; next(); return tmp; } // Постфиксный
 
-    private:
-        T* m_ptr;
-        int m_index;
-        int m_size;
+    
     };
 
     class ConstIterator {
+    private:
+        const T* m_ptr;
+        int m_index;
+        int m_size;
+
     public:
         ConstIterator(const T* ptr, int index, int size)
             : m_ptr(ptr), m_index(index), m_size(size) {}
@@ -62,10 +68,6 @@ public:
         ConstIterator& operator++() { next(); return *this; }
         ConstIterator operator++(int) { ConstIterator tmp = *this; next(); return tmp; }
 
-    private:
-        const T* m_ptr;
-        int m_index;
-        int m_size;
     };
 
 public:
@@ -86,23 +88,53 @@ public:
     }
 
     // Копирование
-    Array& operator=(const Array& other) {
-        if (this == &other) return *this;
+    // Array& operator=(const Array& other) {
+    //     if (this == &other) return *this;
 
-        destroyElements();
-        std::free(buff);
+    //     destroyElements();
+    //     std::free(buff);
 
-        m_capacity = other.m_capacity;
-        m_size = other.m_size;
+    //     m_capacity = other.m_capacity;
+    //     m_size = other.m_size;
 
-        buff = static_cast<T*>(std::malloc(sizeof(T) * m_capacity));
-        for (int i = 0; i < m_size; ++i)
-            new (&buff[i]) T(other.buff[i]);
+    //     buff = static_cast<T*>(std::malloc(sizeof(T) * m_capacity));
+    //     for (int i = 0; i < m_size; ++i)
+    //         new (&buff[i]) T(other.buff[i]);
 
+    //     return *this;
+    // }
+
+
+    // Перемещение копированием
+    // Array& operator=(Array&& other) noexcept {
+    //     if (this == &other) return *this;
+
+    //     destroyElements();
+    //     std::free(buff);
+
+    //     buff = other.buff;
+    //     m_size = other.m_size;
+    //     m_capacity = other.m_capacity;
+
+    //     other.buff = nullptr;
+    //     other.m_size = 0;
+    //     other.m_capacity = 0;
+
+    //     return *this;
+    // }
+
+
+    // Присваивание через copy swap
+    // 
+    Array& operator=(Array other) {
+        std::swap(buff, other.buff);
+        std::swap(m_size, other.m_size);
+        std::swap(m_capacity, other.m_capacity);
         return *this;
     }
 
-    // Переещение
+
+    // Перемещение
     Array(Array&& other) noexcept
         : buff(other.buff), m_size(other.m_size), m_capacity(other.m_capacity)
     {
@@ -111,24 +143,7 @@ public:
         other.m_capacity = 0;
     }
 
-    // Копирование переещение
-    Array& operator=(Array&& other) noexcept {
-        if (this == &other) return *this;
-
-        destroyElements();
-        std::free(buff);
-
-        buff = other.buff;
-        m_size = other.m_size;
-        m_capacity = other.m_capacity;
-
-        other.buff = nullptr;
-        other.m_size = 0;
-        other.m_capacity = 0;
-
-        return *this;
-    }
-
+    
     ~Array() {
         destroyElements();
         std::free(buff);
