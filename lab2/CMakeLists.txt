@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD 17)
 add_library(array_lib INTERFACE)
 target_include_directories(array_lib INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 
-# --- Добавляем GoogleTest через FetchContent ---
+# --- GoogleTest через FetchContent ---
 include(FetchContent)
 FetchContent_Declare(
     googletest
@@ -20,7 +20,8 @@ enable_testing()
 
 # --- Тестовый исполняемый файл ---
 add_executable(tests test_array.cpp)
-target_link_libraries(tests PRIVATE array_lib gtest_main)
+target_link_libraries(tests PRIVATE array_lib gtest gtest_main)
 
+# --- Автоматическое обнаружение тестов ---
 include(GoogleTest)
 gtest_discover_tests(tests)
