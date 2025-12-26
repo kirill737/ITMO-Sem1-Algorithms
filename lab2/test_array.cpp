@@ -22,7 +22,7 @@ TEST(ArrayTest, InsertAtIndex) {
     Array<int> arr;
     arr.insert(1);
     arr.insert(3);
-    arr.insert(1, 2); // вставляем 2 на позицию 1
+    arr.insert(1, 2);
 
     EXPECT_EQ(arr.size(), 3);
     EXPECT_EQ(arr[0], 1);
@@ -37,7 +37,7 @@ TEST(ArrayTest, RemoveElement) {
     arr.insert(2);
     arr.insert(3);
 
-    arr.remove(1); // удаляем 2
+    arr.remove(1);
 
     EXPECT_EQ(arr.size(), 2);
     EXPECT_EQ(arr[0], 1);
@@ -107,7 +107,7 @@ TEST(ArrayTest, Iterator) {
     for (auto it = arr.iterator(); it.hasNext(); it.next()) {
         sum += it.get();
     }
-    EXPECT_EQ(sum, 15); // 1+2+3+4+5
+    EXPECT_EQ(sum, 15);
 }
 
 //  Проверка работы константного итератора 
@@ -120,7 +120,7 @@ TEST(ArrayTest, ConstIterator) {
     for (auto it = cArr.iterator(); it.hasNext(); it.next()) {
         sum += *it;
     }
-    EXPECT_EQ(sum, 6); // 1+2+3=6
+    EXPECT_EQ(sum, 6);
 }
 
 //  Проверка reverseIterator 
@@ -203,7 +203,7 @@ TEST(ArrayTest, InsertAtIndexStr) {
     Array<std::string> arr;
     arr.insert("1");
     arr.insert("3");
-    arr.insert(1, "2"); // вставляем "2" на позицию 1
+    arr.insert(1, "2");
 
     EXPECT_EQ(arr.size(), 3);
     EXPECT_EQ(arr[0], "1");
@@ -218,7 +218,7 @@ TEST(ArrayTest, RemoveElementStr) {
     arr.insert("2");
     arr.insert("3");
 
-    arr.remove(1); // удаляем "2"
+    arr.remove(1);
 
     EXPECT_EQ(arr.size(), 2);
     EXPECT_EQ(arr[0], "1");
@@ -337,10 +337,10 @@ TEST(ArrayTest, BeginEndIteratorsStr) {
 
 //  Проверка расширения массива 
 TEST(ArrayTest, CapacityExpansionStr) {
-    Array<std::string> arr(2); // маленькая начальная емкость
+    Array<std::string> arr(2);
     arr.insert("1");
     arr.insert("2");
-    arr.insert("3"); // должно стать в 2 раза больше
+    arr.insert("3");
 
     EXPECT_EQ(arr.size(), 3);
     EXPECT_EQ(arr.capacity(), 4);
@@ -351,7 +351,7 @@ TEST(ArrayTest, NoCapacityExpansionStr) {
     Array<std::string> arr;
     arr.insert("1");
     arr.insert("2");
-    arr.insert("3"); // не должно измениться, так было сразу 8
+    arr.insert("3");
 
     EXPECT_EQ(arr.size(), 3);
     EXPECT_EQ(arr.capacity(), 8);
